@@ -78,7 +78,7 @@ const FormFields = () => {
   function addOptionsVal() {
     setSelect1((prevState) => {
       const options = [...prevState.properties.options];
-      options.splice(1, 0, {
+      options.push({
         id: uuid(),
         label: optionVal,
         value: {
@@ -87,7 +87,7 @@ const FormFields = () => {
         },
       });
       console.log(options);
-      return { ...prevState, options };
+      return { ...prevState, options: {...options} };
     });
   }
   // console.log(select1);
