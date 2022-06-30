@@ -8,44 +8,47 @@ const FormFields = () => {
     properties: {
       label: 'Select1',
       options: [
-        {
-          id: uuid(),
-          label: 'text1',
-          value: {
-            labelTxt: 'text1',
-            childOptions: [],
-          },
-        },
-        {
-          id: uuid(),
-          label: 'text2',
-          value: {
-            labelTxt: 'text2',
-            childOptions: [],
-          },
-        },
+        // {
+        //   id: uuid(),
+        //   label: null,
+        //   value: {
+        //     labelTxt: 'text1',
+        //     childOptions: [],
+        //   },
+        // },
+        // {
+        //   id: uuid(),
+        //   label: null,
+        //   value: {
+        //     labelTxt: 'text2',
+        //     childOptions: [],
+        //   },
+        // },
       ],
     },
     parentId: null,
   });
   const [element1, setElement1] = useState({
-    id: uuid(),
     type: 'radio',
     properties: {
-      label: 'radio1',
-      value: '',
-      name: '',
+      label: 'Radio question field.',
+      options: [],
+      columns: 1,
     },
-    parentId: null,
+    fillableByCandidate: true,
+    fillableByHR: false,
+    required: false,
   });
   const [element2, setElement2] = useState({
-    id: uuid(),
     type: 'checkbox',
     properties: {
-      label: 'checkbox',
-      value: [],
+      label: 'Checkbox question field.',
+      options: [],
+      columns: 1,
     },
-    parentId: null,
+    required: false,
+    fillableByCandidate: true,
+    fillableByHR: false,
   });
 
   const initialValues = [
@@ -64,9 +67,10 @@ const FormFields = () => {
   function handleElementChange(e) {
     const objId = e.target.value;
 
-    formElements.find((elem) => {
+    formElements.map((elem) => {
       if (elem.id === objId) {
         setSelectedElem(elem);
+        console.log(elem);
       }
     });
   }
@@ -75,22 +79,48 @@ const FormFields = () => {
     setChecked((checked) => !checked);
   }
 
-  function addOptionsVal() {
+  function addOptionsVal(type) {
+    // setSelect1((prevState) => {
+    //   const options = [...prevState.properties.options];
+    //   options.push({
+    //     id: uuid(),
+    //     label: optionVal,
+    //     value: {
+    //       labelTxt: optionVal,
+    //       childOptions: [],
+    //     },
+    //   });
+
+    //   console.log(options);
+    //   return { ...prevState, options };
+    // });
+
     setSelect1((prevState) => {
-      const options = [...prevState.properties.options];
-      options.push({
-        id: uuid(),
-        label: optionVal,
-        value: {
-          labelTxt: optionVal,
-          childOptions: [],
+      const options = [
+        ...prevState.properties.options,
+        {
+          id: uuid(),
+          label: optionVal,
+          value: {
+            labelTxt: optionVal,
+            childOptions: [],
+          },
         },
-      });
-      console.log(options);
-      return { ...prevState, options: {...options} };
+      ];
+      return {
+        ...prevState,
+        properties: {
+          ...prevState.properties,
+          options,
+        },
+      };
     });
+
+    if (type === 'radio') {
+      setElement1((prevState) => {});
+    }
+    setOptionVal('');
   }
-  // console.log(select1);
 
   function handleValueChange(e) {
     setOptionVal(e.target.value);
@@ -113,6 +143,15 @@ const FormFields = () => {
             return <option>{option.label}</option>;
           })}
         </select>
+
+        <input
+          type="checkbox"
+          value="male"
+          checked={checked}
+          onChange={toggleCondition}
+          id="condition"
+        />
+        <label htmlFor="condition">Apply condition</label>
       </div>
       <div>
         {/* {selectValues.map((val, i) => {
@@ -132,16 +171,6 @@ const FormFields = () => {
           onChange={(e) => handleValueChange(e)}
         />
         <button onClick={addOptionsVal}>Add options</button>
-      </div>
-      <div>
-        <input
-          type="checkbox"
-          value="male"
-          checked={checked}
-          onChange={toggleCondition}
-          id="condition"
-        />
-        <label htmlFor="condition">Apply condition</label>
       </div>
       {checked ? (
         <div>
