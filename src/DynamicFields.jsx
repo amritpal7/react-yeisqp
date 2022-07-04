@@ -38,12 +38,14 @@ const FormFields = () => {
       options: [
         {
           id: uuid(),
+          name: 'radio-type',
           optionName: 'male',
           value: '',
           childOptions: [],
         },
         {
           id: uuid(),
+          name: 'radio-type',
           optionName: 'female',
           value: '',
           childOptions: [],
@@ -60,7 +62,20 @@ const FormFields = () => {
     type: 'checkbox',
     properties: {
       label: 'Checkbox question field.',
-      options: [],
+      options: [
+        {
+          id: uuid(),
+          optionName: 'Python',
+          value: '',
+          childOptions: [],
+        },
+        {
+          id: uuid(),
+          optionName: 'JS',
+          value: '',
+          childOptions: [],
+        },
+      ],
       columns: 1,
     },
     required: false,
@@ -81,10 +96,11 @@ const FormFields = () => {
   const [formElements, setFormElements] = useState(initialValues);
   const [selectedElem, setSelectedElem] = useState(null);
   const [elemType, setElemType] = useState('');
+  const [render, setRenderer] = useState(false);
   const [dependencies, setDependencies] = useState({
     selectedElement: null,
     selectedElementValue: null,
-    showElement: null,
+    showElementId: null,
   });
 
   function toggleCondition(e) {
@@ -158,7 +174,7 @@ const FormFields = () => {
   function displayElementHandler(e) {
     setDependencies((prevDeps) => ({
       ...prevDeps,
-      showElement: e.target.value,
+      showElementId: e.target.value,
     }));
     console.log(e.target.value);
   }
@@ -171,12 +187,16 @@ const FormFields = () => {
     console.log('final', dependencies);
   }
 
-  function displayRenderer() {
-    console.log('diaplay');
+  function displayRenderer(e) {
+    console.log(e.target.value);
+    const { selectedElementValue } = dependencies;
+    selectedElementValue === e.target.value
+      ? setRenderer(true)
+      : setRenderer(false);
   }
 
   function handleValueChange(e) {
-    setOptionVal(e.target.value);
+    setOptionVal(e.target);
   }
 
   function handleOptionsRemove(index) {
@@ -193,42 +213,91 @@ const FormFields = () => {
         <select name="" id="" onChange={displayRenderer}>
           <option value="">--select--</option>
           {select1.properties.options.map((option) => {
-            return <option>{option.optionName}</option>;
+            return (
+              <option value={option.optionName}>{option.optionName}</option>
+            );
           })}
         </select>
-
-        {dependencies &&
-          dependencies.showElement !== null &&
-          formElements.map((elem) => {
-            if (elem.id === dependencies.showElement.id) {
-              showElement.type === 'select' ? (
-                <select>
-                  <option>--select--</option>
-                  {elem.properties.options.map((option) => {
-                    return <option>{option.optionName}</option>;
-                  })}
-                </select>
-              ) : showElement.type === 'radio' ? (
-                elem.properties.options.map((option) => {
-                  return (
-                    <div>
-                      <input type="radio" />
-                      <label htmlFor="">{option.optionName}</label>
-                    </div>
-                  );
-                })
-              ) : showElement.type === 'checkbox' ? (
-                showElement.properties.options.map((option) => {
-                  return (
-                    <div>
-                      <input type="checkbox" />
-                      <label htmlFor="">{option.optionName}</label>
-                    </div>
-                  );
-                })
-              ) : null;
-            }
+        <div>
+          {element1.properties.options.map((option) => {
+            return (
+              <div>
+                <input
+                  type="radio"
+                  name={option.name}
+                  value={option.optionName}
+                  onChange={displayRenderer}
+                />
+                <label htmlFor="">{option.optionName}</label>
+              </div>
+            );
           })}
+        </div>
+        <div>
+          {element2.properties.options.map((option) => {
+            return (
+              <div>
+                <input
+                  type="checkbox"
+                  value={option.optionName}
+                  onChange={displayRenderer}
+                />
+                <label htmlFor="">{option.optionName}</label>
+              </div>
+            );
+          })}
+        </div>
+
+        {render && dependencies.showElementId !== null
+          ? formElements.map((elem) => {
+              if (
+                elem.id === dependencies.showElementId &&
+                elem.type === 'radio'
+              ) {
+                return (
+                  <div>
+                    {elem.properties.options.map((option) => {
+                      return (
+                        <div>
+                          <input type="radio" />
+                          <label>{option.optionName} </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              } else if (
+                elem.id === dependencies.showElementId &&
+                elem.type === 'checkbox'
+              ) {
+                return (
+                  <div>
+                    {elem.properties.options.map((option) => {
+                      return (
+                        <div>
+                          <input type="checkbox" />
+                          <label htmlFor="">{option.optionName}</label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              } else if (
+                elem.id === dependencies.showElementId &&
+                elem.type === 'select'
+              ) {
+                return (
+                  <select>
+                    <option value="">--select--</option>
+                    {elem.properties.options.map((option) => {
+                      return <option>{option.optionName}</option>;
+                    })}
+                  </select>
+                );
+              }
+            })
+          : []}
+
         <input
           type="checkbox"
           value="male"
