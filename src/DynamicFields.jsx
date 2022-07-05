@@ -83,17 +83,18 @@ const FormFields = () => {
     fillableByHR: false,
   });
 
-  const initialValues = [
+  const initialElements = [
     JSON.parse(JSON.stringify(select1)),
     JSON.parse(JSON.stringify(element1)),
     JSON.parse(JSON.stringify(element2)),
   ];
 
+  const formElements = initialElements;
+
   const [selectValues, setSelectValues] = useState([]);
   const [optionVal, setOptionVal] = useState('');
   const [checked, setChecked] = useState(false);
   const [filteredElem, setFilteredElem] = useState([]);
-  const [formElements, setFormElements] = useState(initialValues);
   const [selectedElem, setSelectedElem] = useState(null);
   const [elemType, setElemType] = useState('');
   const [render, setRenderer] = useState(false);
@@ -107,7 +108,7 @@ const FormFields = () => {
     setChecked((checked) => !checked);
   }
 
-  function addOptionsVal(type) {
+  function addOptionsVal() {
     // setSelect1((prevState) => {
     //   const options = [...prevState.properties.options];
     //   options.push({
@@ -123,7 +124,7 @@ const FormFields = () => {
     //   return { ...prevState, options };
     // });
 
-    setSelect1((prevState) => {
+    setElement1((prevState) => {
       const options = [
         ...prevState.properties.options,
         {
@@ -143,6 +144,9 @@ const FormFields = () => {
     });
     setOptionVal('');
   }
+
+  console.log(formElements);
+
   function handleElementChange(e) {
     const objId = e.target.value;
 
@@ -171,7 +175,7 @@ const FormFields = () => {
     }));
   }
 
-  function displayElementHandler(e) {
+  function showElementHandler(e) {
     setDependencies((prevDeps) => ({
       ...prevDeps,
       showElementId: e.target.value,
@@ -188,7 +192,6 @@ const FormFields = () => {
   }
 
   function displayRenderer(e) {
-    console.log(e.target.value);
     const { selectedElementValue } = dependencies;
     selectedElementValue === e.target.value
       ? setRenderer(true)
@@ -196,7 +199,7 @@ const FormFields = () => {
   }
 
   function handleValueChange(e) {
-    setOptionVal(e.target);
+    setOptionVal(e.target.value);
   }
 
   function handleOptionsRemove(index) {
@@ -205,6 +208,8 @@ const FormFields = () => {
     console.log(newValues);
     setSelectValues(newValues);
   }
+
+  console.log(selectedElem);
 
   return (
     <>
@@ -259,7 +264,7 @@ const FormFields = () => {
                     {elem.properties.options.map((option) => {
                       return (
                         <div>
-                          <input type="radio" />
+                          <input type="radio" name={option.name} />
                           <label>{option.optionName} </label>
                         </div>
                       );
@@ -298,6 +303,11 @@ const FormFields = () => {
             })
           : []}
 
+        <div>
+          <input type="text" value={optionVal} onChange={handleValueChange} />
+          <button onClick={addOptionsVal}>add options</button>
+        </div>
+
         <input
           type="checkbox"
           value="male"
@@ -328,7 +338,7 @@ const FormFields = () => {
             </select>
           )}
           <label htmlFor=""> Show: </label>
-          <select name="" id="" onChange={displayElementHandler}>
+          <select name="" id="" onChange={showElementHandler}>
             <option value="">--select--</option>
             {filteredElem.map((elem) => {
               return <option value={elem.id}>{elem.type}</option>;
