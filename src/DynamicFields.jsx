@@ -145,8 +145,6 @@ const FormFields = () => {
     setOptionVal('');
   }
 
-  console.log(formElements);
-
   function handleElementChange(e) {
     const objId = e.target.value;
 
@@ -209,7 +207,6 @@ const FormFields = () => {
     setSelectValues(newValues);
   }
 
-  console.log(selectedElem);
 
   return (
     <>
