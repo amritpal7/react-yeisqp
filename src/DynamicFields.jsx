@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { v4 as uuid } from 'uuid';
-
+import ReactSelect from './ReactSelect';
+import SelectBox from './Select';
+import NewModal from './NewModal'
+;
 const FormFields = () => {
   const [select1, setSelect1] = useState({
     id: uuid(),
@@ -8,24 +11,24 @@ const FormFields = () => {
     properties: {
       label: 'Select1',
       options: [
-        {
-          id: uuid(),
-          optionName: 'red 🔴',
-          value: '',
-          childOptions: [],
-        },
-        {
-          id: uuid(),
-          optionName: 'green 🟢',
-          value: '',
-          childOptions: [],
-        },
-        {
-          id: uuid(),
-          optionName: 'blue 🔵',
-          value: '',
-          childOptions: [],
-        },
+        // {
+        //   id: uuid(),
+        //   optionName: 'red 🔴',
+        //   value: '',
+        //   childOptions: [],
+        // },
+        // {
+        //   id: uuid(),
+        //   optionName: 'green 🟢',
+        //   value: '',
+        //   childOptions: [],
+        // },
+        // {
+        //   id: uuid(),
+        //   optionName: 'blue 🔵',
+        //   value: '',
+        //   childOptions: [],
+        // },
       ],
     },
     parentId: null,
@@ -39,15 +42,15 @@ const FormFields = () => {
         {
           id: uuid(),
           name: 'radio-type',
-          optionName: 'male',
-          value: '',
+          value: 'male',
+          label: 'Male',
           childOptions: [],
         },
         {
           id: uuid(),
           name: 'radio-type',
-          optionName: 'female',
-          value: '',
+          value: 'female',
+          label: 'Female',
           childOptions: [],
         },
       ],
@@ -65,14 +68,14 @@ const FormFields = () => {
       options: [
         {
           id: uuid(),
-          optionName: 'Python',
-          value: '',
+          value: 'java',
+          label: 'JAVA',
           childOptions: [],
         },
         {
           id: uuid(),
-          optionName: 'JS',
-          value: '',
+          value: 'python',
+          label: 'Python',
           childOptions: [],
         },
       ],
@@ -104,6 +107,12 @@ const FormFields = () => {
     showElementId: null,
   });
 
+  const [newFormElements, setNewFormElements] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [getFormElementId, setFormElementId] = useState(null);
+
+  let elementOptions = [];
+
   function toggleCondition(e) {
     setChecked((checked) => !checked);
   }
@@ -124,26 +133,43 @@ const FormFields = () => {
     //   return { ...prevState, options };
     // });
 
-    setElement1((prevState) => {
-      const options = [
-        ...prevState.properties.options,
-        {
-          id: uuid(),
-          optionName: optionVal,
-          value: '',
-          childOptions: [],
-        },
-      ];
-      return {
-        ...prevState,
-        properties: {
-          ...prevState.properties,
-          options,
-        },
-      };
-    });
+    // setSelect1((prevState) => {
+    //   const options = [
+    //     ...prevState.properties.options,
+    //     {
+    //       id: uuid(),
+    //       optionName: optionVal,
+    //       value: optionVal,
+    //       label: optionVal.charAt(0).toUpperCase() + optionVal.slice(1),
+    //       childOptions: [],
+    //     },
+    //   ];
+    //   return {
+    //     ...prevState,
+    //     properties: {
+    //       ...prevState.properties,
+    //       options
+    //     },
+    //   };
+    // });
+
+    setNewFormElements(prevElems => {
+      return prevElems.map(prevObj => prevObj.id === getFormElementId ? {...prevObj, properties: {
+        ...prevObj.properties,
+        options: [
+          ...prevObj.properties.options,
+          {
+            id: uuid(),
+            label: optionVal
+          }
+        ]
+      }}: prevObj)
+    })
+   
     setOptionVal('');
   }
+
+  console.log(elementOptions)
 
   function handleElementChange(e) {
     const objId = e.target.value;
@@ -178,6 +204,7 @@ const FormFields = () => {
       ...prevDeps,
       showElementId: e.target.value,
     }));
+
     console.log(e.target.value);
   }
 
@@ -208,46 +235,171 @@ const FormFields = () => {
   }
 
 
+
+  function FormElementsHandler(e) {
+    const elemType = e.target.value;
+    if (!elemType) return;
+
+    setNewFormElements((prevState) => {
+      return [
+        ...prevState,
+        {
+          id: uuid(),
+          type: elemType,
+          properties: {
+            label: elemType,
+            value: '',
+            name: null,
+            options: [],
+          },
+          parentId: null,
+        },
+      ];
+    });
+  }
+
+  const BUTTON_WRAPPER_STYLES = {
+    position: "relative",
+    zIndex: 1,    
+  }
+
+  function getElementIdHandler(e) {
+    setIsOpen(true);
+    setFormElementId(e.target.id)
+  }
+
   return (
     <>
+      <select onChange={FormElementsHandler}>
+        <option value="">--Form Elements--</option>
+        <option value="select">Dropdown</option>
+        <option value="radio">Radio</option>
+        <option value="checkbox">Checkbox</option>
+        <option value="text">TextBox</option>
+      </select>
+      {newFormElements.map((elem) => {
+        const { label, value, name } = elem.properties;
+        return elem.type === 'select' ? (
+          <div>
+          <select onChange={}>
+            <option value="">----</option>
+            {elem.properties.options.map((option) => {
+              return <option value={option.id}>{option.label}</option>;
+            })}
+          </select>
+          {!isOpen && <button style={BUTTON_WRAPPER_STYLES} onClick={getElementIdHandler} id={elem.id}>Settings</button>}
+          </div>
+        ) : elem.type === 'radio' ? (
+          <div>
+            <input type="radio" value={value} name={name} />
+            <label htmlFor="">{label}</label>
+            {!isOpen && <button style={BUTTON_WRAPPER_STYLES} onClick={getElementIdHandler} id={elem.id}>Settings</button>}
+          </div>
+        ) : elem.type === 'checkbox' ? (
+          <div>
+            <input type="checkbox" value={value} name={name} />
+            <label htmlFor="">{label}</label>
+            {!isOpen && <button style={BUTTON_WRAPPER_STYLES} onClick={getElementIdHandler} id={elem.id}>Settings</button>}
+          </div>
+        ) : elem.type === 'text' ? (
+          <div>
+            <label htmlFor="">{label}</label>
+            <input type="text" />
+            {!isOpen && <button style={BUTTON_WRAPPER_STYLES} onClick={getElementIdHandler} id={elem.id}>Settings</button>}
+          </div>
+        ) : (
+          []
+        );
+      })}
+      <NewModal open={isOpen} onClose={() => setIsOpen(false)}>
+          <div>
+          <input type="text" value={optionVal} onChange={handleValueChange} />
+          <button onClick={addOptionsVal}>add options</button>
+        </div>
+          <div>
+        <input
+          type="checkbox"
+          value="male"
+          checked={checked}
+          onChange={toggleCondition}
+          id="condition"
+        />
+        <label htmlFor="condition">Apply condition</label>
+        </div>
+          {checked && (
+        <form onSubmit={handleSubmit}>
+          <label htmlFor=""> When: </label>
+          <select name="" id="" onChange={handleElementChange}>
+            <option>--select--</option>
+            {newFormElements.map((elem) => {
+              return <option value={elem.id}>{elem.type}</option>;
+            })}
+          </select>
+          <label htmlFor=""> Value: </label>
+          {formElement && (
+            <select name="" id="" onChange={elementValueHandler}>
+              <option>--select--</option>
+              {formElement.properties.options.map((option) => {
+                return <option value={option.value}>{option.label}</option>;
+              })}
+            </select>
+          )}
+          <label htmlFor=""> Show: </label>
+          <select name="" id="" onChange={showElementHandler}>
+            <option>--select--</option>
+            {filteredElem.map((elem) => {
+              return <option value={elem.id}>{elem.type}</option>;
+            })}
+          </select>
+          <br />
+          <div>
+            <input type="submit" value="Save" />
+          </div>
+        </form>
+      )}
+      </NewModal>
+      <br />
       {'``````````````Dynamically add select options``````````````````'}
       <div>
-        <select name="" id="" onChange={displayRenderer}>
-          <option value="">--select--</option>
-          {select1.properties.options.map((option) => {
-            return (
-              <option value={option.optionName}>{option.optionName}</option>
-            );
-          })}
-        </select>
+        {dependencies.showElementId !== select1.id && (
+          <select name="" id="" onChange={displayRenderer}>
+            <option value="">--select--</option>
+            {select1.properties.options.map((option) => {
+              return <option value={option.value}>{option.label}</option>;
+            })}
+          </select>
+        )}
+
         <div>
-          {element1.properties.options.map((option) => {
-            return (
-              <div>
-                <input
-                  type="radio"
-                  name={option.name}
-                  value={option.optionName}
-                  onChange={displayRenderer}
-                />
-                <label htmlFor="">{option.optionName}</label>
-              </div>
-            );
-          })}
+          {dependencies.showElementId !== element1.id &&
+            element1.properties.options.map((option) => {
+              return (
+                <div>
+                  <input
+                    type="radio"
+                    name={option.name}
+                    value={option.value}
+                    onChange={displayRenderer}
+                  />
+                  <label htmlFor="">{option.label}</label>
+                </div>
+              );
+            })}
         </div>
         <div>
-          {element2.properties.options.map((option) => {
-            return (
-              <div>
-                <input
-                  type="checkbox"
-                  value={option.optionName}
-                  onChange={displayRenderer}
-                />
-                <label htmlFor="">{option.optionName}</label>
-              </div>
-            );
-          })}
+          {dependencies.showElementId !== element2.id &&
+            element2.properties.options.map((option) => {
+              return (
+                <div>
+                  <input
+                    type="checkbox"
+                    value={option.value}
+                    onChange={displayRenderer}
+                  />
+                  <label htmlFor="">{option.label}</label>
+                </div>
+              );
+            })}
         </div>
 
         {render && dependencies.showElementId !== null
@@ -262,7 +414,7 @@ const FormFields = () => {
                       return (
                         <div>
                           <input type="radio" name={option.name} />
-                          <label>{option.optionName} </label>
+                          <label>{option.label} </label>
                         </div>
                       );
                     })}
@@ -278,7 +430,7 @@ const FormFields = () => {
                       return (
                         <div>
                           <input type="checkbox" />
-                          <label htmlFor="">{option.optionName}</label>
+                          <label htmlFor="">{option.label}</label>
                         </div>
                       );
                     })}
@@ -292,7 +444,7 @@ const FormFields = () => {
                   <select>
                     <option value="">--select--</option>
                     {elem.properties.options.map((option) => {
-                      return <option>{option.optionName}</option>;
+                      return <option>{option.label}</option>;
                     })}
                   </select>
                 );
@@ -318,7 +470,7 @@ const FormFields = () => {
         <form onSubmit={handleSubmit}>
           <label htmlFor=""> When: </label>
           <select name="" id="" onChange={handleElementChange}>
-            <option value="">--select--</option>
+            <option>--select--</option>
             {formElements.map((elem) => {
               return <option value={elem.id}>{elem.type}</option>;
             })}
@@ -326,17 +478,15 @@ const FormFields = () => {
           <label htmlFor=""> Value: </label>
           {selectedElem && (
             <select name="" id="" onChange={elementValueHandler}>
-              <option value="">--select--</option>
+              <option>--select--</option>
               {selectedElem.properties.options.map((option) => {
-                return (
-                  <option value={option.optionName}>{option.optionName}</option>
-                );
+                return <option value={option.value}>{option.label}</option>;
               })}
             </select>
           )}
           <label htmlFor=""> Show: </label>
           <select name="" id="" onChange={showElementHandler}>
-            <option value="">--select--</option>
+            <option>--select--</option>
             {filteredElem.map((elem) => {
               return <option value={elem.id}>{elem.type}</option>;
             })}

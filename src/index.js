@@ -6,6 +6,8 @@ import Fruit from './Fruits';
 import DynamicFields from './DynamicFields';
 import Playground from './Playground';
 import SelectBox from './Select';
+import ReactSelect from './ReactSelect';
+import DSelect from './DSelect';
 
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
@@ -16,5 +18,7 @@ root.render(
     {/* <Playground /> */}
     {/* <SelectBox /> */}
     <DynamicFields />
+    {/* <ReactSelect /> */}
+    {/* <DSelect /> */}
   </StrictMode>
 );
